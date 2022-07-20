@@ -5,15 +5,22 @@ from django.core.mail import send_mail
 from .forms import EmailPostForm, CommentForm
 from django.http import HttpResponse
 from .models import Post, Comment
+from taggit.models import Tag
 
 
-def post_list(request):
+def post_list(request, tag_slug=None):
     # s = 'List of object models'                   # Popytka 1
     # for bb in Post.objects.order_by('-body'):
     #     s += bb.title + '\r\n' + bb.slug
     # return HttpResponse(s, content_type='text/plain; charset=utf-8')
 
     object_list = Post.published.all()
+
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        object_list = object_list.filter(tags__in=[tag])
+
     paginator = Paginator(object_list, 3)   # 3 posts in each page
     page = request.GET.get('page')
     try:
@@ -25,7 +32,7 @@ def post_list(request):
         # If page is out of range deliver last page of results
         posts = paginator.page(paginator.num_pages)
     return render(request, 'blog/post/list.html',
-                  {'page': page, 'posts': posts})
+                  {'page': page, 'posts': posts, 'tag': tag})
 
 
 def post_detail(request, year, month, day, post):
