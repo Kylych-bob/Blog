@@ -42,6 +42,8 @@ INSTALLED_APPS = [
 
     # apps
     'blog.apps.BlogConfig',
+    'account.apps.AccountConfig',
+
     'taggit',
     'django.contrib.sites',
     'django.contrib.sitemaps',
